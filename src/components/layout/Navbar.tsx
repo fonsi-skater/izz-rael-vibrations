@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import CartBadge from "@/components/cart/CartBadge";
+import CompareBadge from "@/components/cart/CompareBadge";
 
 export default function Navbar() {
   const router = useRouter();
@@ -44,10 +45,11 @@ export default function Navbar() {
         </Link>
         <Link
           href="/compare"
-          className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-dark"
+          className="relative flex h-9 w-9 items-center justify-center rounded-full bg-white text-brand-dark"
           aria-label="Compare"
         >
           ⇄
+          <CompareBadge />
         </Link>
       </div>
     </nav>

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { formatPriceKES } from "@/lib/utils";
 import AddToCartButton from "@/components/cart/AddToCartButton";
+import AddToCompareButton from "@/components/product/AddToCompareButton";
 import type { Product } from "@/types";
 
 export default function ProductCard({ product }: { product: Product }) {
@@ -25,7 +26,7 @@ export default function ProductCard({ product }: { product: Product }) {
         </p>
       </Link>
 
-      <div className="mt-3">
+      <div className="mt-3 flex flex-col gap-2">
         <AddToCartButton
           item={{
             productId: product.id,
@@ -36,6 +37,18 @@ export default function ProductCard({ product }: { product: Product }) {
             image: product.images[0],
           }}
           className="w-full rounded-pill bg-brand-dark px-4 py-2 text-xs font-semibold text-white transition hover:brightness-110"
+        />
+        <AddToCompareButton
+          item={{
+            id: product.id,
+            modelName: product.modelName,
+            brand: product.brand.name,
+            category: product.category.name,
+            subcategory: product.subcategory?.name ?? null,
+            price: product.price,
+            stock: product.stock,
+            image: product.images[0],
+          }}
         />
       </div>
     </div>

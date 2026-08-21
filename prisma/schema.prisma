@@ -1,0 +1,111 @@
+// IZZ-RAEL Vibrations — database schema (draft, for review)
+// Maps the spreadsheet hierarchy: Category -> Subcategory -> Brand -> Product
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id            String        @id @default(cuid())
+  name          String        @unique   // Speakers, Keyboards, Mixer, Microphone, Guitar
+  slug          String        @unique
+  subcategories Subcategory[]
+  products      Product[]
+  createdAt     DateTime      @default(now())
+}
+
+model Subcategory {
+  id         String    @id @default(cuid())
+  name       String    // Passive, Electronic, Powered, Plain, Acoustic, Electric, Rhythm
+  category   Category  @relation(fields: [categoryId], references: [id])
+  categoryId String
+  products   Product[]
+
+  @@unique([name, categoryId])
+}
+
+model Brand {
+  id        String    @id @default(cuid())
+  name      String    @unique   // Trill, Nexo, JBL, Yamaha, OMAX, Shure, Ibanez, Fender, Gibson, Olive
+  products  Product[]
+}
+
+model Product {
+  id             String       @id @default(cuid())
+  modelName      String       // e.g. PS15, Psr-sx720, GLXD4
+  slug           String       @unique
+  description    String?
+  price          Int          // stored in KES, whole shillings
+  images         String[]     // Cloudinary URLs
+  stock          Int          @default(0)
+  featured       Boolean      @default(false)
+  category       Category     @relation(fields: [categoryId], references: [id])
+  categoryId     String
+  subcategory    Subcategory? @relation(fields: [subcategoryId], references: [id])
+  subcategoryId  String?
+  brand          Brand        @relation(fields: [brandId], references: [id])
+  brandId        String
+  promotion      Promotion?   @relation(fields: [promotionId], references: [id])
+  promotionId    String?
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model Promotion {
+  id          String    @id @default(cuid())
+  title       String
+  description String?
+  discountPct Int       // e.g. 10 for 10% off
+  active      Boolean   @default(true)
+  startsAt    DateTime?
+  endsAt      DateTime?
+  products    Product[]
+}
+
+model BlogPost {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  coverImage  String?
+  content     String   // markdown or rich text
+  published   Boolean  @default(false)
+  publishedAt DateTime?
+  createdAt   DateTime @default(now())
+}
+
+// Orders are inquiries, not paid transactions (payment happens over WhatsApp)
+// Customers look up order status using the phone number they placed the order with.
+model Order {
+  id             String      @id @default(cuid())
+  customerName   String
+  customerPhone  String      // used as the lookup key on /orders/track
+  items          Json        // [{ productId, modelName, qty, price }]
+  totalPrice     Int
+  status         OrderStatus @default(PENDING)
+  notes          String?
+  createdAt      DateTime    @default(now())
+  updatedAt      DateTime    @updatedAt
+
+  @@index([customerPhone])
+}
+
+enum OrderStatus {
+  PENDING
+  CONFIRMED
+  PROCESSING
+  READY
+  COMPLETED
+  CANCELLED
+}
+
+model Admin {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}

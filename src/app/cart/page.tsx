@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -9,15 +10,52 @@ import { buildWhatsAppOrderLink } from "@/lib/whatsapp";
 
 export default function CartPage() {
   const { items, removeItem, updateQty, totalPrice, clearCart } = useCart();
+  const [customerName, setCustomerName] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
 
-  const whatsappLink = buildWhatsAppOrderLink(
-    items.map((i) => ({
-      modelName: i.modelName,
-      brand: i.brand,
-      price: i.price,
-      qty: i.qty,
-    }))
-  );
+  async function handleCheckout() {
+    if (!customerName.trim() || !customerPhone.trim()) {
+      setError("Please enter your name and phone number.");
+      return;
+    }
+    setError("");
+    setSubmitting(true);
+
+    const res = await fetch("/api/orders", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customerName: customerName.trim(),
+        customerPhone: customerPhone.trim(),
+        items: items.map((i) => ({
+          productId: i.productId,
+          modelName: i.modelName,
+          qty: i.qty,
+          price: i.price,
+        })),
+      }),
+    });
+
+    setSubmitting(false);
+
+    if (!res.ok) {
+      setError("Couldn't save your order. Please try again.");
+      return;
+    }
+
+    const whatsappLink = buildWhatsAppOrderLink(
+      items.map((i) => ({
+        modelName: i.modelName,
+        brand: i.brand,
+        price: i.price,
+        qty: i.qty,
+      }))
+    );
+    window.open(whatsappLink, "_blank");
+    clearCart();
+  }
 
   return (
     <div className="mx-auto max-w-6xl px-4 py-6">
@@ -108,14 +146,38 @@ export default function CartPage() {
                   {formatPriceKES(totalPrice)}
                 </span>
               </div>
-              <a
-                href={whatsappLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="mt-6 flex items-center justify-center gap-2 rounded-pill bg-brand-lime px-5 py-3 text-sm font-semibold text-brand-dark shadow-sm transition hover:brightness-95"
+
+              <div className="mt-4 flex flex-col gap-2">
+                <input
+                  type="text"
+                  placeholder="Your name"
+                  value={customerName}
+                  onChange={(e) => setCustomerName(e.target.value)}
+                  className="rounded-lg border border-black/10 px-3 py-2 text-sm"
+                />
+                <input
+                  type="tel"
+                  placeholder="Phone number (e.g. 2547XXXXXXXX)"
+                  value={customerPhone}
+                  onChange={(e) => setCustomerPhone(e.target.value)}
+                  className="rounded-lg border border-black/10 px-3 py-2 text-sm"
+                />
+                <p className="text-[11px] text-brand-dark/40">
+                  Used to save your order so you can track it later.
+                </p>
+              </div>
+
+              {error && <p className="mt-2 text-xs text-red-500">{error}</p>}
+
+              <button
+                type="button"
+                onClick={handleCheckout}
+                disabled={submitting}
+                className="mt-4 flex w-full items-center justify-center gap-2 rounded-pill bg-brand-lime px-5 py-3 text-sm font-semibold text-brand-dark shadow-sm transition hover:brightness-95 disabled:opacity-50"
               >
-                Order via WhatsApp <span aria-hidden>↗</span>
-              </a>
+                {submitting ? "Placing order..." : "Order via WhatsApp"}{" "}
+                <span aria-hidden>↗</span>
+              </button>
               <p className="mt-3 text-center text-[11px] text-brand-dark/40">
                 No online payment yet — this opens WhatsApp with your order pre-filled.
               </p>

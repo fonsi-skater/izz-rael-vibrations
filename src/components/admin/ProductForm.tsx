@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import ImageUpload from "@/components/admin/ImageUpload";
 
 interface Option {
   id: string;
@@ -207,14 +208,11 @@ export default function ProductForm({
 
       <div>
         <label className="text-xs font-medium text-brand-dark/60">
-          Image URL (optional — Cloudinary upload comes later)
+          Product Image
         </label>
-        <input
-          value={imageUrl}
-          onChange={(e) => setImageUrl(e.target.value)}
-          placeholder="https://..."
-          className="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
-        />
+        <div className="mt-1">
+          <ImageUpload value={imageUrl} onChange={setImageUrl} />
+        </div>
       </div>
 
       {error && <p className="text-xs text-red-500">{error}</p>}

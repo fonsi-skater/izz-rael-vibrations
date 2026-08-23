@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import CartBadge from "@/components/cart/CartBadge";
@@ -18,9 +19,16 @@ export default function Navbar() {
 
   return (
     <nav className="flex items-center justify-between gap-4 rounded-pill bg-brand-dark px-4 py-2.5 text-white">
-      <Link href="/" className="flex items-center gap-2 pl-2 font-semibold">
-        <span className="text-brand-orange">IZZ</span>
-        <span>-RAEL</span>
+      <Link href="/" className="flex items-center gap-2 pl-1">
+        <Image
+          src="/logo/logo-navbar.png"
+          alt="IZZ-RAEL Vibrations"
+          width={32}
+          height={32}
+          className="rounded-full"
+          priority
+        />
+        <span className="hidden font-semibold sm:inline">IZZ-RAEL</span>
       </Link>
 
       <div className="hidden flex-1 items-center rounded-pill bg-white/10 px-4 py-2 text-sm text-white/70 md:flex">

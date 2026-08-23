@@ -8,7 +8,7 @@ interface PostRow {
   id: string;
   title: string;
   published: boolean;
-  createdAt: string;
+  createdAt: Date | string;
 }
 
 export default function BlogTable({ posts }: { posts: PostRow[] }) {

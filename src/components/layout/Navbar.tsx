@@ -22,13 +22,20 @@ export default function Navbar() {
       <Link href="/" className="flex items-center gap-2 pl-1">
         <Image
           src="/logo/logo-navbar.png"
-          alt="IZZ-RAEL Vibrations"
+          alt="IZZ-RAEL Vibrations logo"
           width={32}
           height={32}
-          className="rounded-full"
+          className="shrink-0"
           priority
         />
-        <span className="hidden font-semibold sm:inline">IZZ-RAEL</span>
+        <span className="flex flex-col leading-none">
+          <span className="text-sm font-semibold tracking-wide">
+            IZZ-RAEL
+          </span>
+          <span className="text-[9px] font-medium tracking-[0.2em] text-white/60">
+            VIBRATIONS
+          </span>
+        </span>
       </Link>
 
       <div className="hidden flex-1 items-center rounded-pill bg-white/10 px-4 py-2 text-sm text-white/70 md:flex">

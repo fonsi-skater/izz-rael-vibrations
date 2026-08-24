@@ -35,7 +35,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
           maxPrice ? { price: { lte: Number(maxPrice) } } : {},
         ],
       },
-      include: { brand: true, category: true, subcategory: true },
+      include: { brand: true, category: true, subcategory: true, promotion: true },
       orderBy: { createdAt: "desc" },
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),

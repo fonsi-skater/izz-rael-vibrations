@@ -5,7 +5,7 @@ import { prisma } from "@/lib/prisma";
 
 export default async function ProductsPage() {
   const products = await prisma.product.findMany({
-    include: { brand: true, category: true, subcategory: true },
+    include: { brand: true, category: true, subcategory: true, promotion: true },
     orderBy: { createdAt: "desc" },
   });
 

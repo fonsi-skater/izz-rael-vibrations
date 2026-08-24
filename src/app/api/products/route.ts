@@ -15,12 +15,13 @@ const productSchema = z.object({
   categoryId: z.string().min(1),
   subcategoryId: z.string().optional().nullable(),
   brandId: z.string().min(1),
+  promotionId: z.string().optional().nullable(),
 });
 
 // GET /api/products — list all products (public)
 export async function GET() {
   const products = await prisma.product.findMany({
-    include: { brand: true, category: true, subcategory: true },
+    include: { brand: true, category: true, subcategory: true, promotion: true },
     orderBy: { createdAt: "desc" },
   });
   return NextResponse.json(products);

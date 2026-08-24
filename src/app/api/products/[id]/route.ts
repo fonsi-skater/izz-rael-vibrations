@@ -14,6 +14,7 @@ const updateSchema = z.object({
   categoryId: z.string().min(1).optional(),
   subcategoryId: z.string().optional().nullable(),
   brandId: z.string().min(1).optional(),
+  promotionId: z.string().optional().nullable(),
 });
 
 // GET /api/products/[id]
@@ -23,7 +24,7 @@ export async function GET(
 ) {
   const product = await prisma.product.findUnique({
     where: { id: params.id },
-    include: { brand: true, category: true, subcategory: true },
+    include: { brand: true, category: true, subcategory: true, promotion: true },
   });
   if (!product) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });

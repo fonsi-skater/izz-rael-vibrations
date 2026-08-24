@@ -7,12 +7,14 @@ export default async function EditProductPage({
 }: {
   params: { id: string };
 }) {
-  const [product, categories, subcategories, brands] = await Promise.all([
-    prisma.product.findUnique({ where: { id: params.id } }),
-    prisma.category.findMany({ orderBy: { name: "asc" } }),
-    prisma.subcategory.findMany({ orderBy: { name: "asc" } }),
-    prisma.brand.findMany({ orderBy: { name: "asc" } }),
-  ]);
+  const [product, categories, subcategories, brands, promotions] =
+    await Promise.all([
+      prisma.product.findUnique({ where: { id: params.id } }),
+      prisma.category.findMany({ orderBy: { name: "asc" } }),
+      prisma.subcategory.findMany({ orderBy: { name: "asc" } }),
+      prisma.brand.findMany({ orderBy: { name: "asc" } }),
+      prisma.promotion.findMany({ orderBy: { title: "asc" } }),
+    ]);
 
   if (!product) return notFound();
 
@@ -23,6 +25,7 @@ export default async function EditProductPage({
         categories={categories}
         subcategories={subcategories}
         brands={brands}
+        promotions={promotions}
         initial={{
           id: product.id,
           modelName: product.modelName,
@@ -32,6 +35,7 @@ export default async function EditProductPage({
           categoryId: product.categoryId,
           subcategoryId: product.subcategoryId,
           brandId: product.brandId,
+          promotionId: product.promotionId,
           images: product.images,
         }}
       />

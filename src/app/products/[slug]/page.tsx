@@ -3,6 +3,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { prisma } from "@/lib/prisma";
 import { formatPriceKES } from "@/lib/utils";
+import { getActiveDiscount, getDiscountedPrice } from "@/lib/pricing";
 import { buildWhatsAppOrderLink } from "@/lib/whatsapp";
 
 export default async function ProductDetailPage({
@@ -12,16 +13,21 @@ export default async function ProductDetailPage({
 }) {
   const product = await prisma.product.findUnique({
     where: { slug: params.slug },
-    include: { brand: true, category: true, subcategory: true },
+    include: { brand: true, category: true, subcategory: true, promotion: true },
   });
 
   if (!product) return notFound();
+
+  const discountPct = getActiveDiscount(product.promotion);
+  const finalPrice = discountPct
+    ? getDiscountedPrice(product.price, discountPct)
+    : product.price;
 
   const whatsappLink = buildWhatsAppOrderLink([
     {
       modelName: product.modelName,
       brand: product.brand.name,
-      price: product.price,
+      price: finalPrice,
       qty: 1,
     },
   ]);
@@ -30,7 +36,12 @@ export default async function ProductDetailPage({
     <div className="mx-auto max-w-6xl px-4 py-6">
       <Navbar />
       <main className="mt-6 grid gap-8 rounded-card bg-white p-6 shadow-panel md:grid-cols-2 md:p-10">
-        <div className="flex h-72 items-center justify-center rounded-xl bg-brand-panel text-sm text-brand-dark/40 md:h-full">
+        <div className="relative flex h-72 items-center justify-center rounded-xl bg-brand-panel text-sm text-brand-dark/40 md:h-full">
+          {discountPct && (
+            <span className="absolute left-3 top-3 rounded-pill bg-brand-orange px-3 py-1 text-xs font-semibold text-white">
+              -{discountPct}% OFF
+            </span>
+          )}
           {product.images[0] ? (
             <img
               src={product.images[0]}
@@ -50,9 +61,17 @@ export default async function ProductDetailPage({
           <h1 className="mt-2 text-2xl font-semibold text-brand-dark">
             {product.brand.name} {product.modelName}
           </h1>
-          <p className="mt-3 text-xl font-semibold text-brand-orange">
-            {formatPriceKES(product.price)}
-          </p>
+
+          <div className="mt-3 flex items-baseline gap-3">
+            <p className="text-xl font-semibold text-brand-orange">
+              {formatPriceKES(finalPrice)}
+            </p>
+            {discountPct && (
+              <p className="text-sm text-brand-dark/40 line-through">
+                {formatPriceKES(product.price)}
+              </p>
+            )}
+          </div>
 
           {product.description && (
             <p className="mt-4 text-sm text-brand-dark/70">

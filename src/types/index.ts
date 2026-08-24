@@ -15,6 +15,15 @@ export interface Brand {
   name: string;
 }
 
+export interface Promotion {
+  id: string;
+  title: string;
+  discountPct: number;
+  active: boolean;
+  startsAt: Date | string | null;
+  endsAt: Date | string | null;
+}
+
 export interface Product {
   id: string;
   modelName: string;
@@ -27,6 +36,7 @@ export interface Product {
   category: Category;
   subcategory: Subcategory | null;
   brand: Brand;
+  promotion?: Promotion | null;
 }
 
 export interface CartLine {

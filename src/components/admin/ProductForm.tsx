@@ -13,6 +13,7 @@ interface ProductFormProps {
   categories: Option[];
   subcategories: (Option & { categoryId: string })[];
   brands: Option[];
+  promotions: (Option & { discountPct: number })[];
   initial?: {
     id: string;
     modelName: string;
@@ -22,6 +23,7 @@ interface ProductFormProps {
     categoryId: string;
     subcategoryId: string | null;
     brandId: string;
+    promotionId: string | null;
     images: string[];
   };
 }
@@ -30,6 +32,7 @@ export default function ProductForm({
   categories,
   subcategories,
   brands,
+  promotions,
   initial,
 }: ProductFormProps) {
   const router = useRouter();
@@ -44,6 +47,7 @@ export default function ProductForm({
     initial?.subcategoryId ?? ""
   );
   const [brandId, setBrandId] = useState(initial?.brandId ?? "");
+  const [promotionId, setPromotionId] = useState(initial?.promotionId ?? "");
   const [imageUrl, setImageUrl] = useState(initial?.images?.[0] ?? "");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -65,6 +69,7 @@ export default function ProductForm({
       categoryId,
       subcategoryId: subcategoryId || null,
       brandId,
+      promotionId: promotionId || null,
       images: imageUrl ? [imageUrl] : [],
     };
 
@@ -201,6 +206,24 @@ export default function ProductForm({
           {brands.map((b) => (
             <option key={b.id} value={b.id}>
               {b.name}
+            </option>
+          ))}
+        </select>
+      </div>
+
+      <div>
+        <label className="text-xs font-medium text-brand-dark/60">
+          Promotion (optional)
+        </label>
+        <select
+          value={promotionId}
+          onChange={(e) => setPromotionId(e.target.value)}
+          className="mt-1 w-full rounded-lg border border-black/10 px-3 py-2 text-sm"
+        >
+          <option value="">None</option>
+          {promotions.map((p) => (
+            <option key={p.id} value={p.id}>
+              {p.name} (-{p.discountPct}%)
             </option>
           ))}
         </select>

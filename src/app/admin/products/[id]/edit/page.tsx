@@ -25,7 +25,7 @@ export default async function EditProductPage({
         categories={categories}
         subcategories={subcategories}
         brands={brands}
-        promotions={promotions}
+        promotions={promotions.map((p) => ({ id: p.id, name: p.title, discountPct: p.discountPct }))}
         initial={{
           id: product.id,
           modelName: product.modelName,

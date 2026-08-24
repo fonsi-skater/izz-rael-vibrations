@@ -16,7 +16,7 @@ export default async function NewProductPage() {
         categories={categories}
         subcategories={subcategories}
         brands={brands}
-        promotions={promotions}
+        promotions={promotions.map((p) => ({ id: p.id, name: p.title, discountPct: p.discountPct }))}
       />
     </div>
   );

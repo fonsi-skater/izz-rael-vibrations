@@ -29,9 +29,25 @@ export async function GET() {
 
 // POST /api/products — create a product (admin only)
 export async function POST(req: NextRequest) {
+  const cookieHeader = req.headers.get("cookie");
   const session = await getServerSession(authOptions);
+
+  console.log("DEBUG POST cookie header present:", Boolean(cookieHeader));
+  console.log("DEBUG POST session result:", JSON.stringify(session));
+
   if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      {
+        error: "Unauthorized",
+        debug: {
+          hadCookieHeader: Boolean(cookieHeader),
+          cookieNames: cookieHeader?.split(";").map(c => c.trim().split("=")[0]) ?? [],
+          hasSecret: Boolean(process.env.NEXTAUTH_SECRET),
+          nextAuthUrl: process.env.NEXTAUTH_URL,
+        },
+      },
+      { status: 401 }
+    );
   }
 
   const body = await req.json();

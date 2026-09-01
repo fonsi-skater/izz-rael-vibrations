@@ -11,12 +11,12 @@ export default function ImageUpload({ value, onChange }: ImageUploadProps) {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState("");
 
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
+
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME;
-    const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
 
     if (!cloudName || !uploadPreset) {
       setError("Cloudinary isn't configured yet.");
@@ -80,6 +80,11 @@ export default function ImageUpload({ value, onChange }: ImageUploadProps) {
       </label>
 
       {error && <p className="mt-1 text-xs text-red-500">{error}</p>}
+
+      {/* TEMPORARY DEBUG — remove once Cloudinary config is confirmed working */}
+      <div className="mt-2 rounded bg-yellow-50 p-2 text-[10px] text-yellow-800">
+        DEBUG — cloudName: "{cloudName ?? "UNDEFINED"}" | uploadPreset: "{uploadPreset ?? "UNDEFINED"}"
+      </div>
     </div>
   );
 }

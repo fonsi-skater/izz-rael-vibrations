@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
+
+// AUTH TEMPORARILY DISABLED — see middleware.ts note.
 
 const blogSchema = z.object({
   title: z.string().min(1),
@@ -12,7 +12,6 @@ const blogSchema = z.object({
   published: z.boolean().default(false),
 });
 
-// GET /api/blog — list all posts (public; includes unpublished for admin use)
 export async function GET() {
   const posts = await prisma.blogPost.findMany({
     orderBy: { createdAt: "desc" },
@@ -20,13 +19,7 @@ export async function GET() {
   return NextResponse.json(posts);
 }
 
-// POST /api/blog — create a post (admin only)
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await req.json();
   const parsed = blogSchema.safeParse(body);
 

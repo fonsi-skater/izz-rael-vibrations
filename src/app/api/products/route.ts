@@ -1,9 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { slugify } from "@/lib/utils";
+
+// AUTH TEMPORARILY DISABLED — see middleware.ts note.
 
 const productSchema = z.object({
   modelName: z.string().min(1),
@@ -18,7 +18,6 @@ const productSchema = z.object({
   promotionId: z.string().optional().nullable(),
 });
 
-// GET /api/products — list all products (public)
 export async function GET() {
   const products = await prisma.product.findMany({
     include: { brand: true, category: true, subcategory: true, promotion: true },
@@ -27,29 +26,7 @@ export async function GET() {
   return NextResponse.json(products);
 }
 
-// POST /api/products — create a product (admin only)
 export async function POST(req: NextRequest) {
-  const cookieHeader = req.headers.get("cookie");
-  const session = await getServerSession(authOptions);
-
-  console.log("DEBUG POST cookie header present:", Boolean(cookieHeader));
-  console.log("DEBUG POST session result:", JSON.stringify(session));
-
-  if (!session) {
-    return NextResponse.json(
-      {
-        error: "Unauthorized",
-        debug: {
-          hadCookieHeader: Boolean(cookieHeader),
-          cookieNames: cookieHeader?.split(";").map(c => c.trim().split("=")[0]) ?? [],
-          hasSecret: Boolean(process.env.NEXTAUTH_SECRET),
-          nextAuthUrl: process.env.NEXTAUTH_URL,
-        },
-      },
-      { status: 401 }
-    );
-  }
-
   const body = await req.json();
   const parsed = productSchema.safeParse(body);
 

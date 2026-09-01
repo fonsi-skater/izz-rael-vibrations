@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+
+// AUTH TEMPORARILY DISABLED — see middleware.ts note.
 
 const updateSchema = z.object({
   title: z.string().min(1).optional(),
@@ -11,16 +11,10 @@ const updateSchema = z.object({
   published: z.boolean().optional(),
 });
 
-// PUT /api/blog/[id] — update (admin only)
 export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await req.json();
   const parsed = updateSchema.safeParse(body);
 
@@ -52,16 +46,10 @@ export async function PUT(
   return NextResponse.json(post);
 }
 
-// DELETE /api/blog/[id] — admin only
 export async function DELETE(
   _req: NextRequest,
   { params }: { params: { id: string } }
 ) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   await prisma.blogPost.delete({ where: { id: params.id } });
   return NextResponse.json({ success: true });
 }

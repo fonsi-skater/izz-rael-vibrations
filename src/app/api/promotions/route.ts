@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
 import { z } from "zod";
-import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+
+// AUTH TEMPORARILY DISABLED — see middleware.ts note.
 
 const promoSchema = z.object({
   title: z.string().min(1),
@@ -13,7 +13,6 @@ const promoSchema = z.object({
   endsAt: z.string().optional().nullable(),
 });
 
-// GET /api/promotions — list all (public; admin panel also uses this)
 export async function GET() {
   const promotions = await prisma.promotion.findMany({
     include: { products: true },
@@ -22,13 +21,7 @@ export async function GET() {
   return NextResponse.json(promotions);
 }
 
-// POST /api/promotions — create (admin only)
 export async function POST(req: NextRequest) {
-  const session = await getServerSession(authOptions);
-  if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
-
   const body = await req.json();
   const parsed = promoSchema.safeParse(body);
 

@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import BlogForm from "@/components/admin/BlogForm";
 import { prisma } from "@/lib/prisma";

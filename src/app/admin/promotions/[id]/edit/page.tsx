@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { notFound } from "next/navigation";
 import PromotionForm from "@/components/admin/PromotionForm";
 import { prisma } from "@/lib/prisma";

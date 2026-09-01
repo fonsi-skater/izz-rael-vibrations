@@ -37,9 +37,28 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: { id: string } }
 ) {
+  const cookieHeader = req.headers.get("cookie");
+  console.log("DEBUG cookie header present:", Boolean(cookieHeader));
+  console.log("DEBUG cookie header names:", cookieHeader?.split(";").map(c => c.trim().split("=")[0]));
+  console.log("DEBUG NEXTAUTH_SECRET set:", Boolean(process.env.NEXTAUTH_SECRET));
+  console.log("DEBUG NEXTAUTH_URL value:", process.env.NEXTAUTH_URL);
+
   const session = await getServerSession(authOptions);
+  console.log("DEBUG session result:", JSON.stringify(session));
+
   if (!session) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    return NextResponse.json(
+      {
+        error: "Unauthorized",
+        debug: {
+          hadCookieHeader: Boolean(cookieHeader),
+          cookieNames: cookieHeader?.split(";").map(c => c.trim().split("=")[0]) ?? [],
+          hasSecret: Boolean(process.env.NEXTAUTH_SECRET),
+          nextAuthUrl: process.env.NEXTAUTH_URL,
+        },
+      },
+      { status: 401 }
+    );
   }
 
   const body = await req.json();
